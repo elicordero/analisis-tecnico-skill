@@ -8,6 +8,3 @@ node_modules/
 # Sistema
 .DS_Store
 Thumbs.db
-
-# Salida de manuales generados
-docs/manual-usuario/images/

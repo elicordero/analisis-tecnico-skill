@@ -8,7 +8,9 @@ Skill de OpenCode para generar y mantener manuales de usuario en español, orien
 - Documenta únicamente funciones confirmadas en código o verificadas en una interfaz accesible.
 - Verifica flujos visuales con navegador automatizado solo si ya está configurado (Playwright MCP u otro); usa capturas reales, nunca inventadas.
 - Nunca modifica el código de la aplicación, ni ejecuta acciones destructivas, ni incluye credenciales, secretos o datos personales reales.
-- Entrega el manual en Markdown y, si hay conversor disponible, en PDF.
+- Solicita los datos de login de prueba (URL, usuario y contraseña) cuando el flujo requiere autenticación, y nunca los guarda ni los incluye en el manual.
+- Genera la salida **fuera del proyecto**, en una carpeta hermana llamada `manual-usuario-<nombre-proyecto>`.
+- Entrega el manual final en **DOCX** (`manual.docx`), usando Markdown como fuente intermedia.
 
 Es una skill **bajo demanda**: no se activa durante el trabajo normal de desarrollo.
 
@@ -47,24 +49,28 @@ Reinicia OpenCode para que detecte la skill.
 
 Ejemplos:
 
-- `@manual-usuario documenta el módulo de activos para el perfil de administrador. Genera Markdown y PDF; no modifiques la aplicación.`
+- `@manual-usuario documenta el módulo de activos para el perfil de administrador. Genera el DOCX; no modifiques la aplicación.`
 - `/manual-usuario crea el manual del flujo de creación de trámites. Usa solo capturas reales del entorno de pruebas.`
-- `Actualiza el manual del módulo de inspecciones comparando el código actual con docs/manual-usuario/manual.md.`
+- `Actualiza el manual del módulo de inspecciones comparando el código actual con ../manual-usuario-mi-proyecto/manual.md.`
 
-Salida por defecto en `docs/manual-usuario/`:
+Salida por defecto **fuera de la ruta del proyecto**, en una carpeta hermana llamada `manual-usuario-<nombre-proyecto>`:
 
 ```
-docs/manual-usuario/
-├── manual.md
-├── manual.pdf        # si hay conversor disponible
-└── images/           # capturas reales
+<directorio-padre>/
+├── mi-proyecto/                # el proyecto
+└── manual-usuario-mi-proyecto/ # salida del manual
+    ├── manual.md               # fuente Markdown (intermedia)
+    ├── manual.docx             # entregable final (obligatorio)
+    └── images/                 # capturas reales embebidas en el DOCX
 ```
+
+`<nombre-proyecto>` es el nombre de la carpeta raíz del proyecto o el nombre del paquete de `composer.json`.
 
 ## Requisitos
 
 - OpenCode con soporte de skills.
 - Opcional: navegador automatizado (Playwright MCP u otro) para verificación visual y capturas.
-- Opcional: conversor Markdown a PDF ya instalado (Pandoc u otro). La skill no instala herramientas por su cuenta.
+- Necesario para el entregable: conversor de Markdown a DOCX ya instalado (Pandoc, LibreOffice u otro). La skill no instala herramientas por su cuenta.
 
 ## Licencia
 
