@@ -1,6 +1,6 @@
 ---
 name: analisis-tecnico
-description: Analiza mediante ingeniería inversa sistemas Laravel y Livewire existentes. Inspecciona módulos, clases, componentes, rutas, modelos, servicios, eventos, políticas, migraciones y dependencias para generar diagramas basados en el código real.
+description: Analiza mediante ingeniería inversa sistemas Laravel y Livewire existentes. Inspecciona módulos, clases, componentes, rutas, modelos, servicios, eventos, políticas, migraciones y dependencias para generar diagramas basados en el código real, con estilo visual cuidado, y entregar toda la documentación en DOCX editable junto con sus fuentes.
 compatibility: opencode
 metadata:
   opencode/slash: "true"
@@ -31,6 +31,7 @@ El objetivo es comprender y documentar el sistema existente sin modificar su com
 10. Respetar las convenciones, la arquitectura y las versiones tecnológicas del proyecto.
 11. No afirmar que se inspeccionó un archivo, se ejecutó una herramienta o se validó un diagrama si no se hizo realmente.
 12. Si una herramienta no está disponible, continuar con los medios disponibles y explicar la limitación cuando sea relevante.
+13. Entregar la documentación en DOCX editable además de las fuentes Markdown, con los diagramas renderizados e incrustados.
 
 ## 3. Fase 1: descubrimiento del repositorio
 
@@ -233,19 +234,18 @@ Si existe un renderizador compatible, utilizarlo para comprobar la representaci�
 
 No afirmar que los diagramas fueron ejecutados, renderizados o validados automáticamente si no se realizó esa comprobación.
 
-## 8. Fase 6: almacenamiento de resultados
+## 8. Fase 6: almacenamiento y entrega en DOCX
 
 Crear la documentación dentro de una carpeta dedicada, sin mezclarla con el código de aplicación.
 
-Ubicación predeterminada:
+Ubicación predeterminada: `docs/architecture/`.
 
-`docs/architecture/`
-
-Estructura recomendada:
+### 8.1 Estructura
 
 ```text
 docs/architecture/
 ├── README.md
+├── README.docx
 ├── system-overview.mmd
 ├── components.mmd
 ├── class-diagram.mmd
@@ -253,11 +253,15 @@ docs/architecture/
 ├── modules/
 │   └── nombre-modulo/
 │       ├── README.md
+│       ├── README.docx
 │       ├── use-cases.puml
 │       ├── activity.mmd
 │       ├── sequence.mmd
 │       └── states.mmd
-└── findings.md
+├── assets/            # SVG renderizados de cada diagrama
+├── findings.md
+├── findings.docx
+└── reference.docx     # plantilla de estilos para Word
 ```
 
 Crear únicamente los archivos pertinentes al alcance solicitado.
@@ -267,11 +271,135 @@ Crear únicamente los archivos pertinentes al alcance solicitado.
 - Usar archivos BPMN 2.0 cuando se genere un modelo BPMN formal.
 - Mantener los nombres y formatos existentes si el proyecto ya tiene convenciones establecidas.
 
+Cada documento entregable se genera en dos formatos con el mismo contenido:
+
+- `.md` — fuente intermedia, editable como texto.
+- `.docx` — entregable editable para Word.
+
 El `README.md` debe explicar la arquitectura documentada, el alcance, las limitaciones y los enlaces a los diagramas.
 
 El archivo `findings.md` debe registrar discrepancias comprobadas, relaciones inferidas, áreas no analizadas y riesgos técnicos detectados durante la inspección.
 
 Si el proyecto ya tiene una estructura de documentación arquitectónica, respetarla en lugar de duplicarla.
+
+### 8.2 Estilo visual de los diagramas
+
+Todos los diagramas deben compartir un estilo limpio, moderno y consistente: mismo tipo de letra, misma paleta, mismo grosor de línea y mismos márgenes. La apariencia es parte del entregable, no un detalle opcional.
+
+Usar un tema base claro con acentos en índigo y gris pizarra. Para Mermaid, `htmlLabels: false` es obligatorio para que el SVG se incruste correctamente en Word. Para PlantUML, usar un bloque `<style>` en lugar de `skinparam`.
+
+`mermaid-config.json`:
+
+```json
+{
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Segoe UI, Inter, Helvetica, Arial, sans-serif",
+    "fontSize": "14px",
+    "background": "#ffffff",
+    "primaryColor": "#eef2ff",
+    "primaryTextColor": "#1e1b4b",
+    "primaryBorderColor": "#4f46e5",
+    "lineColor": "#64748b",
+    "secondaryColor": "#f8fafc",
+    "secondaryBorderColor": "#cbd5e1",
+    "tertiaryColor": "#f1f5f9",
+    "noteBkgColor": "#fef9c3",
+    "noteBorderColor": "#facc15",
+    "noteTextColor": "#422006",
+    "textColor": "#0f172a",
+    "edgeLabelBackground": "#ffffff"
+  },
+  "flowchart": {
+    "htmlLabels": false,
+    "curve": "basis",
+    "nodeSpacing": 40,
+    "rankSpacing": 55,
+    "padding": 12,
+    "useMaxWidth": false
+  },
+  "sequence": { "actorMargin": 60, "messageMargin": 35, "boxMargin": 8 },
+  "themeCSS": ".node rect, .node polygon { rx:8; ry:8; stroke-width:1.5px; }"
+}
+```
+
+Bloque de estilo de PlantUML (al inicio de cada `.puml`):
+
+```plantuml
+<style>
+root {
+  FontName "Segoe UI"
+  FontSize 14
+  FontColor #0F172A
+  LineColor #64748B
+  BackgroundColor #FFFFFF
+}
+element { RoundCorner 12; Shadowing 0; Padding 10; LineThickness 1.5 }
+node, component, class, participant, actor, database, artifact, rectangle, state {
+  BackgroundColor #EEF2FF
+  LineColor #4F46E5
+  FontColor #1E1B4B
+}
+arrow, arrowhead { LineColor #4F46E5; LineThickness 1.5; FontColor #334155 }
+note { BackgroundColor #FEF9C3; LineColor #FACC15; FontColor #422006; RoundCorner 8 }
+</style>
+skinparam shadowing false
+skinparam dpi 300
+```
+
+Los selectores de PlantUML varían según la familia de diagrama (secuencia, clases, actividades). Renderizar un diagrama de prueba antes de aplicar el estilo a todo el conjunto.
+
+### 8.3 Renderizado de diagramas
+
+Renderizar cada diagrama a SVG dentro de `assets/`:
+
+```bash
+mmdc -i diagrama.mmd -o assets/diagrama.svg -c mermaid-config.json -b transparent
+java -jar plantuml.jar -charset UTF-8 -tsvg -o assets diagrama.puml
+```
+
+El SVG es vectorial: se mantiene nítido al ampliar en Word. Guardar siempre el `.mmd`/`.puml` de origen junto al SVG renderizado. Si el SVG no puede incrustarse, exportar PNG de alta resolución (`mmdc -s 3 -b white`) y usar ese archivo.
+
+Un diagrama solo se considera entregado cuando su imagen renderizada se inserta en el DOCX junto con su código fuente.
+
+### 8.4 Generación del DOCX editable
+
+Convertir cada documento Markdown a DOCX con Pandoc, usando una plantilla de referencia para controlar los estilos de Word (fuentes, títulos, márgenes, tablas):
+
+```bash
+pandoc README.md -o README.docx --standalone --toc --toc-depth=3 \
+  --reference-doc=docs/architecture/reference.docx \
+  --resource-path=.:docs/architecture
+```
+
+En cada documento que incluya un diagrama, insertar la imagen y, a continuación, el código fuente del diagrama en un bloque de código:
+
+~~~markdown
+![Diagrama de componentes](assets/components.svg){width=100%}
+
+```mermaid
+...contenido de components.mmd...
+```
+~~~
+
+Esto produce un DOCX editable: el texto es editable de forma nativa y cada diagrama se puede recuperar y modificar a partir del código fuente incluido. No presentar la imagen como un objeto editable de Word; la edición real se hace sobre el `.mmd`/`.puml` y se vuelve a renderizar.
+
+Generar la plantilla de referencia la primera vez si no existe:
+
+```bash
+pandoc -o docs/architecture/reference.docx --print-default-data-file reference.docx
+```
+
+### 8.5 Herramientas requeridas
+
+El entregable requiere herramientas externas. Detectar su disponibilidad y, si falta alguna, instalarla con el gestor disponible antes de continuar. Si la instalación no es posible, continuar con lo que haya, entregar las fuentes y reportar el comando exacto pendiente.
+
+- `pandoc` — conversión Markdown a DOCX. `winget install JohnMacFarlane.Pandoc`, `brew install pandoc`, `apt install pandoc`.
+- `mmdc` (`@mermaid-js/mermaid-cli`) — renderizado de Mermaid. `npm i -g @mermaid-js/mermaid-cli`.
+- `java` + `plantuml.jar` — renderizado de PlantUML. Instalar un JDK y descargar el jar, o `winget install plantuml` / `choco install plantuml`.
+- Opcional: `rsvg-convert` o `inkscape` como conversión alternativa de SVG.
+
+Informar siempre qué herramientas se instalaron. No instalar de forma silenciosa.
 
 No crear documentación adicional que no aporte valor al alcance solicitado.
 
@@ -335,6 +463,7 @@ Presentar un resumen con:
 - Alcance analizado.
 - Módulos identificados.
 - Diagramas creados o actualizados.
+- Archivos generados (fuentes `.md`/`.mmd`/`.puml` y entregables `.docx`) y su ubicación.
 - Fuentes de evidencia utilizadas.
 - Discrepancias comprobadas.
 - Supuestos e inferencias.
