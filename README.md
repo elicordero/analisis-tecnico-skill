@@ -11,14 +11,15 @@ El entregable final es un **DOCX**. El Markdown se usa solo como fuente intermed
 - Verifica flujos visuales con navegador automatizado solo si ya está configurado (Playwright MCP u otro); usa capturas reales, nunca inventadas.
 - Solicita los datos de login de prueba (URL, usuario y contraseña) cuando el flujo requiere autenticación, y nunca los guarda ni los incluye en el manual.
 - Genera la salida **fuera del proyecto**, en una carpeta hermana llamada `manual-usuario-<nombre-proyecto>`.
+- **Retoma el manual existente**: si ya existe un manual previo en la carpeta de salida, lo actualiza de forma incremental (solo las partes desactualizadas); si no existe, lo crea desde cero.
 - Nunca modifica el código de la aplicación, ni ejecuta acciones destructivas, ni incluye credenciales, secretos o datos personales reales.
 
 Es una skill **bajo demanda**: no se activa durante el trabajo normal de desarrollo.
 
 ## Cómo funciona
 
-1. **Delimitar**: confirma aplicación, módulo, público, entorno autorizado, datos de login (si aplican), carpeta de salida y formato.
-2. **Inspeccionar el código**: revisa rutas, componentes, vistas, middleware, Policies/Gates, Requests/validaciones, menús y traducciones.
+1. **Delimitar**: confirma aplicación, módulo, público, entorno autorizado, datos de login (si aplican), carpeta de salida y formato. Detecta si ya existe un manual previo para elegir entre creación desde cero o actualización incremental.
+2. **Inspeccionar el código**: revisa rutas, componentes, vistas, middleware, Policies/Gates, Requests/validaciones, menús y traducciones. En modo actualización, compara contra el manual existente y detecta solo las diferencias.
 3. **Verificar el flujo visual** (si hay URL de pruebas y navegador): pide login, navega sin acciones destructivas y captura pantallas reales.
 4. **Redactar**: estructura en objetivo, requisitos de acceso, cómo ingresar, procedimientos, permisos, errores, FAQ, glosario y pendientes.
 5. **Revisar calidad**: comprueba que cada paso exista en el código o interfaz, sin credenciales ni datos sensibles.
