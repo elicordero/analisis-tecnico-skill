@@ -238,30 +238,34 @@ No afirmar que los diagramas fueron ejecutados, renderizados o validados automá
 
 Crear la documentación dentro de una carpeta dedicada, sin mezclarla con el código de aplicación.
 
-Ubicación predeterminada: `docs/architecture/`.
+Ubicación predeterminada: una carpeta hermana **fuera** de la carpeta del proyecto, llamada `analisis-tecnico-<nombre-proyecto>`. No crear la documentación dentro del proyecto.
+
+`<nombre-proyecto>` es el nombre de la carpeta raíz del proyecto o, si no coincide, el nombre del paquete de `composer.json`. Si la carpeta de salida ya existe, se reutiliza y se actualiza en lugar de recrearla.
 
 ### 8.1 Estructura
 
 ```text
-docs/architecture/
-├── README.md
-├── README.docx
-├── system-overview.mmd
-├── components.mmd
-├── class-diagram.mmd
-├── database-erd.mmd
-├── modules/
-│   └── nombre-modulo/
-│       ├── README.md
-│       ├── README.docx
-│       ├── use-cases.puml
-│       ├── activity.mmd
-│       ├── sequence.mmd
-│       └── states.mmd
-├── assets/            # SVG renderizados de cada diagrama
-├── findings.md
-├── findings.docx
-└── reference.docx     # plantilla de estilos para Word
+<directorio-padre>/
+├── <nombre-proyecto>/                     # el proyecto analizado
+└── analisis-tecnico-<nombre-proyecto>/    # salida de la documentación
+    ├── README.md
+    ├── README.docx
+    ├── system-overview.mmd
+    ├── components.mmd
+    ├── class-diagram.mmd
+    ├── database-erd.mmd
+    ├── modules/
+    │   └── nombre-modulo/
+    │       ├── README.md
+    │       ├── README.docx
+    │       ├── use-cases.puml
+    │       ├── activity.mmd
+    │       ├── sequence.mmd
+    │       └── states.mmd
+    ├── assets/            # SVG renderizados de cada diagrama
+    ├── findings.md
+    ├── findings.docx
+    └── reference.docx     # plantilla de estilos para Word
 ```
 
 Crear únicamente los archivos pertinentes al alcance solicitado.
@@ -364,12 +368,12 @@ Un diagrama solo se considera entregado cuando su imagen renderizada se inserta 
 
 ### 8.4 Generación del DOCX editable
 
-Convertir cada documento Markdown a DOCX con Pandoc, usando una plantilla de referencia para controlar los estilos de Word (fuentes, títulos, márgenes, tablas):
+Convertir cada documento Markdown a DOCX con Pandoc, ejecutando desde la carpeta de salida y usando una plantilla de referencia para controlar los estilos de Word (fuentes, títulos, márgenes, tablas):
 
 ```bash
 pandoc README.md -o README.docx --standalone --toc --toc-depth=3 \
-  --reference-doc=docs/architecture/reference.docx \
-  --resource-path=.:docs/architecture
+  --reference-doc=reference.docx \
+  --resource-path=.
 ```
 
 En cada documento que incluya un diagrama, insertar la imagen y, a continuación, el código fuente del diagrama en un bloque de código:
@@ -384,10 +388,10 @@ En cada documento que incluya un diagrama, insertar la imagen y, a continuación
 
 Esto produce un DOCX editable: el texto es editable de forma nativa y cada diagrama se puede recuperar y modificar a partir del código fuente incluido. No presentar la imagen como un objeto editable de Word; la edición real se hace sobre el `.mmd`/`.puml` y se vuelve a renderizar.
 
-Generar la plantilla de referencia la primera vez si no existe:
+Generar la plantilla de referencia en la carpeta de salida la primera vez si no existe:
 
 ```bash
-pandoc -o docs/architecture/reference.docx --print-default-data-file reference.docx
+pandoc -o reference.docx --print-default-data-file reference.docx
 ```
 
 ### 8.5 Herramientas requeridas
@@ -429,13 +433,14 @@ No declarar que el análisis es completo si quedaron áreas relevantes sin inspe
 
 Cuando se solicite actualizar la documentación:
 
-1. Leer los diagramas y el inventario existentes.
+1. Leer los diagramas y el inventario existentes de la carpeta de salida `analisis-tecnico-<nombre-proyecto>`.
 2. Compararlos con el código actual.
 3. Identificar cambios de clases, tablas, rutas y dependencias.
 4. Actualizar únicamente los diagramas afectados.
 5. Conservar los nombres y formatos establecidos.
 6. Eliminar información obsoleta solo cuando se haya confirmado que ya no corresponde al sistema.
-7. Registrar las áreas que no pudieron verificarse.
+7. Volver a renderizar los diagramas afectados y regenerar los DOCX correspondientes.
+8. Registrar las áreas que no pudieron verificarse.
 
 No sobrescribir documentación arquitectónica existente sin revisar su contenido.
 
@@ -449,7 +454,7 @@ Para repositorios grandes:
 2. Comenzar por la estructura, las rutas y los archivos de configuración pertinentes.
 3. Seleccionar archivos por módulo y seguir las referencias reales.
 4. Registrar hallazgos en un inventario breve para evitar releer información sin necesidad.
-5. Reutilizar la documentación arquitectónica existente después de contrastarla con el código actual.
+5. Reutilizar la documentación arquitectónica existente de la carpeta de salida después de contrastarla con el código actual.
 6. Analizar en etapas y consolidar los resultados.
 7. Evitar regenerar diagramas que no hayan sido afectados por los cambios.
 8. No omitir inspecciones esenciales solo para reducir tokens.

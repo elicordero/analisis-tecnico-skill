@@ -16,6 +16,7 @@ El objetivo es comprender y documentar el sistema sin modificar su comportamient
 - Aplica un estilo visual limpio, moderno y consistente a todos los diagramas (tema claro, acentos índigo, tipografía y espaciado uniformes).
 - Entrega toda la documentación en dos formatos: fuente (`.md`, `.mmd`, `.puml`) y **DOCX editable** para Word.
 - Incrusta cada diagrama renderizado (SVG vectorial) en el DOCX junto con su código fuente, para poder editarlo y volver a renderizarlo.
+- Genera todo fuera de la carpeta del proyecto, en una carpeta hermana `analisis-tecnico-<nombre-proyecto>`.
 - Nunca modifica código de aplicación, configuración ni base de datos; no ejecuta operaciones destructivas; no expone secretos, tokens ni valores sensibles.
 
 ## Cómo funciona
@@ -26,7 +27,7 @@ El objetivo es comprender y documentar el sistema sin modificar su comportamient
 4. **Generación de diagramas**: crea solo los diagramas que aportan valor al alcance solicitado.
 5. **Validación**: comprueba sintaxis, nombres, direcciones de dependencias, cardinalidades y flujos contra el repositorio.
 6. **Renderizado y DOCX**: renderiza cada diagrama a SVG con el estilo definido y convierte cada documento Markdown a DOCX editable con Pandoc, incrustando los diagramas y su código fuente.
-7. **Almacenamiento**: escribe la documentación en una carpeta dedicada `docs/architecture/`, sin mezclarla con el código.
+7. **Almacenamiento**: escribe la documentación en una carpeta hermana fuera del proyecto, `analisis-tecnico-<nombre-proyecto>`, sin mezclarla con el código.
 
 ## Diagramas
 
@@ -91,29 +92,33 @@ Si la solicitud no especifica alcance, la skill comienza con un inventario de al
 
 ## Salida
 
-La documentación se genera dentro de una carpeta dedicada, por defecto `docs/architecture/`:
+La documentación se genera **fuera de la carpeta del proyecto**, en una carpeta hermana llamada `analisis-tecnico-<nombre-proyecto>`:
 
 ```text
-docs/architecture/
-├── README.md
-├── README.docx
-├── system-overview.mmd
-├── components.mmd
-├── class-diagram.mmd
-├── database-erd.mmd
-├── modules/
-│   └── nombre-modulo/
-│       ├── README.md
-│       ├── README.docx
-│       ├── use-cases.puml
-│       ├── activity.mmd
-│       ├── sequence.mmd
-│       └── states.mmd
-├── assets/            # SVG renderizados de cada diagrama
-├── findings.md
-├── findings.docx
-└── reference.docx     # plantilla de estilos para Word
+<directorio-padre>/
+├── <nombre-proyecto>/                     # el proyecto analizado
+└── analisis-tecnico-<nombre-proyecto>/    # salida de la documentación
+    ├── README.md
+    ├── README.docx
+    ├── system-overview.mmd
+    ├── components.mmd
+    ├── class-diagram.mmd
+    ├── database-erd.mmd
+    ├── modules/
+    │   └── nombre-modulo/
+    │       ├── README.md
+    │       ├── README.docx
+    │       ├── use-cases.puml
+    │       ├── activity.mmd
+    │       ├── sequence.mmd
+    │       └── states.mmd
+    ├── assets/            # SVG renderizados de cada diagrama
+    ├── findings.md
+    ├── findings.docx
+    └── reference.docx     # plantilla de estilos para Word
 ```
+
+`<nombre-proyecto>` es el nombre de la carpeta raíz del proyecto o, si no coincide, el nombre del paquete de `composer.json`. Si la carpeta de salida ya existe, se reutiliza y actualiza.
 
 - `README.md` / `README.docx`: arquitectura documentada, alcance, limitaciones y enlaces a los diagramas.
 - `findings.md` / `findings.docx`: discrepancias comprobadas, relaciones inferidas, áreas no analizadas y riesgos técnicos.
