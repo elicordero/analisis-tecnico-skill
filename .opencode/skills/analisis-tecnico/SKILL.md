@@ -236,18 +236,18 @@ No afirmar que los diagramas fueron ejecutados, renderizados o validados automá
 
 ## 8. Fase 6: almacenamiento y entrega en DOCX
 
-Crear la documentación dentro de una carpeta dedicada, sin mezclarla con el código de aplicación.
+Crear la documentación en una carpeta dedicada **fuera** del proyecto, sin mezclarla con el código de aplicación y sin escribir ningún documento dentro del proyecto.
 
-Ubicación predeterminada: una carpeta hermana **fuera** de la carpeta del proyecto, llamada `analisis-tecnico-<nombre-proyecto>`. No crear la documentación dentro del proyecto.
+Ubicación obligatoria: una carpeta hermana **fuera** de la carpeta del proyecto, llamada `analisis-tecnico-<nombre-plataforma>`.
 
-`<nombre-proyecto>` es el nombre de la carpeta raíz del proyecto o, si no coincide, el nombre del paquete de `composer.json`. Si la carpeta de salida ya existe, se reutiliza y se actualiza en lugar de recrearla.
+`<nombre-plataforma>` es el nombre de la plataforma o sistema analizado: el que indique la solicitud; si no se indica, el nombre del paquete de `composer.json` o, en su defecto, el de la carpeta raíz del proyecto. Puede diferir del nombre de la carpeta del proyecto. Si la carpeta de salida ya existe, se reutiliza y se actualiza en lugar de recrearla.
 
 ### 8.1 Estructura
 
 ```text
 <directorio-padre>/
 ├── <nombre-proyecto>/                     # el proyecto analizado
-└── analisis-tecnico-<nombre-proyecto>/    # salida de la documentación
+└── analisis-tecnico-<nombre-plataforma>/  # salida de la documentación
     ├── README.md
     ├── README.docx
     ├── system-overview.mmd
@@ -284,7 +284,7 @@ El `README.md` debe explicar la arquitectura documentada, el alcance, las limita
 
 El archivo `findings.md` debe registrar discrepancias comprobadas, relaciones inferidas, áreas no analizadas y riesgos técnicos detectados durante la inspección.
 
-Si el proyecto ya tiene una estructura de documentación arquitectónica, respetarla en lugar de duplicarla.
+Si el proyecto ya tiene documentación arquitectónica, usarla como referencia y respetar sus nombres y formato en la carpeta de salida, sin duplicarla ni escribir dentro del proyecto.
 
 ### 8.2 Estilo visual de los diagramas
 
@@ -433,7 +433,7 @@ No declarar que el análisis es completo si quedaron áreas relevantes sin inspe
 
 Cuando se solicite actualizar la documentación:
 
-1. Leer los diagramas y el inventario existentes de la carpeta de salida `analisis-tecnico-<nombre-proyecto>`.
+1. Leer los diagramas y el inventario existentes de la carpeta de salida `analisis-tecnico-<nombre-plataforma>`.
 2. Compararlos con el código actual.
 3. Identificar cambios de clases, tablas, rutas y dependencias.
 4. Actualizar únicamente los diagramas afectados.
